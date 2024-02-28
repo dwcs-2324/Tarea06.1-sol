@@ -23,9 +23,9 @@ class NotaController extends AbstractController
 {
     // #[Route('/nota', name: 'app_nota')]
     #[Route('/notas', name: 'notas', methods: ["GET"])]
-    public function index(NotaRepository $todoRepository): JsonResponse
+    public function index(NotaRepository $notaRepository): JsonResponse
     {
-        $notas = $todoRepository->findAll();
+        $notas = $notaRepository->findAll();
         return $this->json($notas);
 
         // return $this->json([
@@ -36,36 +36,36 @@ class NotaController extends AbstractController
 
 
     #[Route("/notas/{id}", "get_nota", methods: ["GET"])]
-    public function getTodo(Nota $todo): JsonResponse
+    public function getNota(Nota $nota): JsonResponse
     {
-        return $this->json($todo);
+        return $this->json($nota);
     }
 
 
     #[Route("/notas", "create_nota", methods: ["POST"])]
     public function createNota(
         Request $request,
-        NotaRepository $todoRepository,
+        NotaRepository $notaRepository,
         ValidatorInterface $validator
         ,
-        NotaOptionsResolver $todoOptionsResolver
+        NotaOptionsResolver $notaOptionsResolver
     ): JsonResponse {
 
         try {
             $requestBody = json_decode($request->getContent(), true);
-            $fields = $todoOptionsResolver->configureTitle(true)->resolve($requestBody);
-            $todo = new Nota();
-            $todo->setTitle($requestBody["title"]);
+            $fields = $notaOptionsResolver->configureTitle(true)->resolve($requestBody);
+            $nota = new Nota();
+            $nota->setTitle($requestBody["title"]);
             // To validate the entity
-            $errors = $validator->validate($todo);
+            $errors = $validator->validate($nota);
             if (count($errors) > 0) {
                 throw new InvalidArgumentException((string) $errors);
             }
 
             //++tuve que añadir yo a mano el método save en el repository
-            $todoRepository->save($todo, true);
+            $notaRepository->save($nota, true);
             //$todoRepository->getEntityManager()->persist($todo);
-            return $this->json($todo, status: Response::HTTP_CREATED);
+            return $this->json($nota, status: Response::HTTP_CREATED);
         }
         //++ \Exception con scope global
         catch (\Exception $e) {
@@ -74,21 +74,21 @@ class NotaController extends AbstractController
     }
 
     #[Route("/notas/{id}", "delete_nota", methods: ["DELETE"])]
-    public function deleteTodo(Nota $nota, NotaRepository $todoRepository)
+    public function deleteNota(Nota $nota, NotaRepository $notaRepository)
     {
-        $todoRepository->remove($nota, true);
+        $notaRepository->remove($nota, true);
         return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 
     #[Route("/notas/{id}", "update_nota", methods: ["PATCH", "PUT"])]
-    public function updateNota(Nota $nota, Request $request, NotaOptionsResolver $todoOptionsResolver, ValidatorInterface $validator,
+    public function updateNota(Nota $nota, Request $request, NotaOptionsResolver $notaOptionsResolver, ValidatorInterface $validator,
      EntityManagerInterface $em)
     {
         try {
             $requestBody = json_decode($request->getContent(), true);
            
             $isPutMethod = $request->getMethod() === "PUT";
-            $fields = $todoOptionsResolver
+            $fields = $notaOptionsResolver
                 ->configureTitle($isPutMethod)
                 ->configureCompleted($isPutMethod)
                 ->resolve($requestBody);
