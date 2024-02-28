@@ -15,10 +15,10 @@ class Nota
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-   
+
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-#[Assert\Length(max: 255)]
+    #[Assert\Length(max: 255)]
     private ?string $title = null;
 
     #[ORM\Column]
@@ -139,6 +139,6 @@ class Nota
     {
         return $this->id;
 
-        
+
     }
 }
